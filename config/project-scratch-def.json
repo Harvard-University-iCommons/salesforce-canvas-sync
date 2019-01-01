@@ -1,0 +1,7 @@
+{
+    "orgName": "Harvard Scratch Org",
+    "edition": "Developer",
+    "orgPreferences" : {
+        "enabled": ["S1DesktopEnabled"]
+    }
+}
