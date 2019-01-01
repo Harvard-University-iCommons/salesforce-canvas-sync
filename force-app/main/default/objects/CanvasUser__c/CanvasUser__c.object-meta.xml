@@ -64,6 +64,6 @@
         <searchFilterFields>Contact__c</searchFilterFields>
         <searchResultsAdditionalFields>Contact__c</searchResultsAdditionalFields>
     </searchLayouts>
-    <sharingModel>ControlledByParent</sharingModel>
+    <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>
