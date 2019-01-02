@@ -18,10 +18,6 @@
                 <behavior>Edit</behavior>
                 <field>CanvasCourseId__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>SisId__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

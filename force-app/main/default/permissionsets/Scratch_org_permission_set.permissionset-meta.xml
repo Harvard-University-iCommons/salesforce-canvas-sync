@@ -15,11 +15,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>CanvasCourse__c.SisId__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>CanvasEnrollment__c.CanvasEnrollmentId__c</field>
         <readable>true</readable>
     </fieldPermissions>
