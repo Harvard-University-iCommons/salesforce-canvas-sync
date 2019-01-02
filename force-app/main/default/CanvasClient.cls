@@ -227,6 +227,7 @@ public with sharing class CanvasClient {
         return req;
     }
 
+    /* 
     private static String formatApiBody(Map<String, String> params) {
         // this seems to be the least-gross way to build a URL query string or form-encoded POST body...
         System.PageReference tmpUrl = new System.PageReference('');
@@ -234,4 +235,5 @@ public with sharing class CanvasClient {
         // getUrl() produces a string that starts with '//?' so we need to rip that off
         return tmpUrl.getUrl().substringAfter('?');
     }
+    */
 }
