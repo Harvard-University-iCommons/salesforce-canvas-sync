@@ -2,7 +2,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
-        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, SisId__c  FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
+        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
         System.debug(c.Name);
                 
         Integer canvas_course_id;
@@ -17,7 +17,7 @@ public with sharing class CanvasClient {
         if (c.CanvasCourseId__c != null) {
             canvasCourseIdParam = String.valueOf(c.CanvasCourseId__c);
         } else {
-            canvasCourseIdParam = 'sis_course_id:' + c.SisId__c;
+            canvasCourseIdParam = 'sis_course_id:' + c.Id;
         }
 
         HttpRequest req = prepareRequest('courses/' + canvasCourseIdParam, 'GET', settings);
@@ -59,7 +59,7 @@ public with sharing class CanvasClient {
 
         if (u.CanvasUserId__c != null) {
             System.debug('updating an existing Canvas user by id: ' + u.CanvasUserId__c);
-            // update the name
+            // TODO: update the name and email
         }
         else {
             // First, search for an existing user with this email address
@@ -113,9 +113,6 @@ public with sharing class CanvasClient {
         // fetch the CanvasEnrollment__c record
         CanvasEnrollment__c ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId];
 
-        // fetch the CanvasUser__c record
-        // CanvasUser__c cu = [SELECT Id, CanvasUserId__c FROM CanvasUser__c WHERE Contact__c = :ce.Contact__c LIMIT 1];
-        
         // now we've got a Canvas user and course ID; ready to create/update the enrollment record: 
         Canvas_Settings__c settings = Canvas_Settings__c.getInstance();
         
@@ -140,7 +137,7 @@ public with sharing class CanvasClient {
 
         innerMap.put('name', canvasCourse.Title__c);
         innerMap.put('course_code', canvasCourse.Name);
-        innerMap.put('sis_course_id', canvasCourse.SisId__c);
+        innerMap.put('sis_course_id', canvasCourse.Id);
 
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('course', innerMap);
