@@ -4,12 +4,12 @@
             "path": "force-app",
             "default": true,
             "package": "Canvas Sync",
-            "versionName": "ver 0.2",
-            "versionNumber": "0.2.0.NEXT"
+            "versionName": "ver 0.3",
+            "versionNumber": "0.3.0.NEXT"
         }
     ],
     "namespace": "",
-    "sfdcLoginUrl": "https://harvard-at-dev-ed.my.salesforce.com",
+    "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "44.0",
     "packageAliases": {
         "Canvas Sync": "0Ho1U000000001TSAQ"
