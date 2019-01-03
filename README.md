@@ -6,8 +6,11 @@ This Salesforce app contains functionality to help manage courses, users and enr
 
 Prerequisites:
 * Install the `sfdx` command-line tool
-* Have a Salesforce Dev Hub org set up
-* Create a new scratch org
+* Have a Salesforce Dev Hub org set up 
+* Authenticate the CLI tool to your Dev Hub org:
+```
+sfdx force:auth:web:login
+```
 
 Steps: 
 * Check out this project from GitHub 
