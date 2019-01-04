@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CanvasCourseLink__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(CanvasCourseId__c &gt; 0, HYPERLINK($Setup.Canvas_Settings__c.base_url__c &amp; &#39;courses/&#39; &amp; TEXT(CanvasCourseId__c),  Title__c ), null )</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Canvas Course Link</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
