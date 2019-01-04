@@ -65,7 +65,6 @@ public with sharing class CanvasClient {
             if (update_user_res.getStatusCode() == 200) {
                 CanvasUser__c updatedUser = jsonToUser(update_user_res.getBody(), u);
                 System.debug('successfully updated user'+updatedUser);
-                // update updatedUser; (AFAIK We dont need to update the SF object)
             } else {
                 System.debug('got a non-200 response from the update/edit user call: '+ update_user_res.getStatusCode());
                 System.debug(update_user_res.getBody());
