@@ -56,10 +56,20 @@ public with sharing class CanvasClient {
 
         // if our CanvasUser object already has a CanvasUserId__c value, assume that the user already exists
         // otherwise, search for an existing user
-
         if (u.CanvasUserId__c != null) {
             System.debug('updating an existing Canvas user by id: ' + u.CanvasUserId__c);
-            // TODO: update the name and email
+            // update the name and email, as user is already present
+            HttpRequest update_user_req = prepareRequest('/users/'+ u.CanvasUserId__c, 'PUT', settings);
+            update_user_req.setBody(userToJsonForUpdate(u));
+            HTTPResponse update_user_res = http.send(update_user_req);      
+            if (update_user_res.getStatusCode() == 200) {
+                CanvasUser__c updatedUser = jsonToUser(update_user_res.getBody(), u);
+                System.debug('successfully updated user'+updatedUser);
+            } else {
+                System.debug('got a non-200 response from the update/edit user call: '+ update_user_res.getStatusCode());
+                System.debug(update_user_res.getBody());
+                System.debug(update_user_req.toString());
+            }  
         }
         else {
             // First, search for an existing user with this email address
@@ -178,6 +188,20 @@ public with sharing class CanvasClient {
         outerMap.put('communication_channel', communicationChannelMap);
         String jsonUser = JSON.serializePretty(outerMap, true);
 
+        return jsonUser;
+    }
+
+    private static String userToJsonForUpdate(CanvasUser__c canvasUser) {
+        // given a CanvasUser sObject, return a JSON string that can be passed to the Canvas update user API call. 
+        // Note that the json format is different for update/edit
+        
+        Map<String, Object> userMap = new Map<String, Object>();
+        userMap.put('name', canvasUser.Contact__r.Name);
+        userMap.put('email', canvasUser.Contact__r.Email);
+       
+        Map<String, Object> outerMap = new Map<String, Object>();
+        outerMap.put('user', userMap);
+        String jsonUser = JSON.serializePretty(outerMap, true);
         return jsonUser;
     }
 
