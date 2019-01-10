@@ -6,8 +6,8 @@ This Salesforce app contains functionality to help manage courses, users and enr
 
 Prerequisites:
 * Install the `sfdx` command-line tool
-* Have a Salesforce Dev Hub org set up 
-* Enable 'Dev Hub' slider in the browser under the Development -> Dev Hub menu options
+* Have a Salesforce Dev org set up (Go to https://developer.salesforce.com/signup if you don't have one)
+* In the Salesforce UI, enable 'Dev Hub' slider in the browser under the Development -> Dev Hub menu options
 * Authenticate the CLI tool to your Dev Hub org:
 ```
 sfdx force:auth:web:login
