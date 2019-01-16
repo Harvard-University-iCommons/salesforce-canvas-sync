@@ -10,7 +10,7 @@ Prerequisites:
 * In the Salesforce UI, enable 'Dev Hub' slider in the browser under the Development -> Dev Hub menu options
 * Authenticate the CLI tool to your Dev Hub org:
 ```
-sfdx force:auth:web:login
+sfdx force:auth:web:login -d -a DevHub
 ```
 
 Steps: 
