@@ -14,6 +14,12 @@ sfdx force:auth:web:login
 ```
 
 Steps: 
+* [Review this step: Set the default user name:
+```
+[sfdx force:config:set defaultdevhubusername=<username>]
+[sfdx force:config:set defaultusername=<myscratchorg>]
+```
+
 * Check out this project from GitHub 
 * From the project directory, create a new scratch org: 
 ```
