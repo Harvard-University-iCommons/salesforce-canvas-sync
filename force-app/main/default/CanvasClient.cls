@@ -56,7 +56,6 @@ public with sharing class CanvasClient {
 
         // if our CanvasUser object already has a CanvasUserId__c value, assume that the user already exists
         // otherwise, search for an existing user
-        //
         if (u.CanvasUserId__c != null) {
             System.debug('updating an existing Canvas user by id: ' + u.CanvasUserId__c);
             // update the name and email, as user is already present
@@ -74,7 +73,6 @@ public with sharing class CanvasClient {
         }
         else {
             // First, search for an existing user with this email address
-            //
             String search_term = EncodingUtil.urlEncode(u.Contact__r.Email, 'UTF-8');
             HttpRequest find_user_req = prepareRequest('accounts/1/users?search_term='+search_term, 'GET', settings);
             Map<String, String> params = new Map<String, String>();
