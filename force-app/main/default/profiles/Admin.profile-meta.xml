@@ -94,6 +94,10 @@
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <tabVisibilities>
+        <tab>ActivityLog__c</tab>
+        <visibility>DefaultOn</visibility>
+    </tabVisibilities>
+    <tabVisibilities>
         <tab>CanvasCourse__c</tab>
         <visibility>Hidden</visibility>
     </tabVisibilities>

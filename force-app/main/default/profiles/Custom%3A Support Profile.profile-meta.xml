@@ -58,6 +58,10 @@
         <layout>CanvasUser__c-Canvas User Layout</layout>
     </layoutAssignments>
     <tabVisibilities>
+        <tab>ActivityLog__c</tab>
+        <visibility>DefaultOn</visibility>
+    </tabVisibilities>
+    <tabVisibilities>
         <tab>CanvasCourse__c</tab>
         <visibility>Hidden</visibility>
     </tabVisibilities>
