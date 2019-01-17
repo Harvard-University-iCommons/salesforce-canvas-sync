@@ -69,7 +69,14 @@ public with sharing class CanvasClient {
                 System.debug('got a non-200 response from the update/edit user call: '+ update_user_res.getStatusCode());
                 System.debug(update_user_res.getBody());
                 System.debug(update_user_req.toString());
-            }  
+
+                ActivityLog__c log = new  ActivityLog__c();
+                log.LEVEL__c = 'ERROR';
+                String errorStr =  update_user_res.getBody() + '\n'+  update_user_req.toString();                
+                log.Message__c = 'syncCanvasUser '+ errorStr;
+                log.Source__c='CanvasClient';
+                insert log;   
+            } 
         }
         else {
             // First, search for an existing user with this email address
@@ -105,10 +112,24 @@ public with sharing class CanvasClient {
                         System.debug('got a non-200 response from the create user call: '+ new_user_res.getStatusCode());
                         System.debug(new_user_res.getBody());
                         System.debug(new_user_req.toString());
+
+                        ActivityLog__c log = new  ActivityLog__c();
+                        log.LEVEL__c = 'ERROR';
+                        String errorStr =  new_user_res.getBody()  + '\n'+  new_user_res.toString();                 
+                        log.Message__c = 'syncCanvasUser '+ errorStr;
+                        log.Source__c='CanvasClient';
+                        insert log;   
                     }                
                 } else {
                     // Found more than one matching user; bail
                     System.debug('Search for ' + contact.Email + ' returned ' + users.size() +' results');
+                    ActivityLog__c log = new  ActivityLog__c();
+                    log.LEVEL__c = 'ERROR';
+                    String errorStr =  'Search for ' + contact.Email + ' returned ' + users.size() +' results';               
+                    log.Message__c = 'syncCanvasUser '+ errorStr;
+                    log.Source__c='CanvasClient';
+                    insert log;
+
                     return;
                 }
             } else {
