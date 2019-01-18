@@ -70,12 +70,8 @@ public with sharing class CanvasClient {
                 System.debug(update_user_res.getBody());
                 System.debug(update_user_req.toString());
 
-                ActivityLog__c log = new  ActivityLog__c();
-                log.LEVEL__c = 'ERROR';
-                String errorStr =  update_user_res.getBody() + '\n'+  update_user_req.toString();                
-                log.Message__c = 'syncCanvasUser '+ errorStr;
-                log.Source__c='CanvasClient';
-                insert log;   
+                String errorStr =  'syncCanvasUser '+ '\n' + update_user_res.getBody() + '\n'+  update_user_req.toString(); 
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
             } 
         }
         else {
@@ -113,27 +109,23 @@ public with sharing class CanvasClient {
                         System.debug(new_user_res.getBody());
                         System.debug(new_user_req.toString());
 
-                        ActivityLog__c log = new  ActivityLog__c();
-                        log.LEVEL__c = 'ERROR';
-                        String errorStr =  new_user_res.getBody()  + '\n'+  new_user_res.toString();                 
-                        log.Message__c = 'syncCanvasUser '+ errorStr;
-                        log.Source__c='CanvasClient';
-                        insert log;   
+                        String errorStr =  'syncCanvasUser '+ '\n' + new_user_res.getBody() + '\n'+  new_user_res.toString(); 
+                        CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
                     }                
                 } else {
                     // Found more than one matching user; bail
-                    System.debug('Search for ' + contact.Email + ' returned ' + users.size() +' results');
-                    ActivityLog__c log = new  ActivityLog__c();
-                    log.LEVEL__c = 'ERROR';
-                    String errorStr =  'Search for ' + contact.Email + ' returned ' + users.size() +' results';               
-                    log.Message__c = 'syncCanvasUser '+ errorStr;
-                    log.Source__c='CanvasClient';
-                    insert log;
+                    System.debug('Search for ' + contact.Email + ' returned ' + users.size() +' results');                    
+                    
+                    String errorStr =  'Search for ' + contact.Email + ' returned ' + users.size() +' results';                        
+                    CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
 
                     return;
                 }
             } else {
                 System.debug('searching for a user returned a non-200 response');
+                
+                String errorStr =  'searching for a user returned a non-200 response';                       
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
             }
         }
     }
