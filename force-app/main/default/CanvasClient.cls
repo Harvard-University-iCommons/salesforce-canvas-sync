@@ -153,9 +153,14 @@ public with sharing class CanvasClient {
             String newEnrlJsonText = new_enrl_res.getBody();
             ce = jsonToEnrollment(newEnrlJsonText, ce);
             update ce;
+            CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated user enrollment : '+ce.CanvasUser__r.CanvasUserId__c+' in course:'+ce.CanvasCourse__r.CanvasCourseId__c, 'CanvasClient.syncEnrollmentToCanvas');
+
         } else {
-            System.debug('Got a non-200 response when enrolling a user');
-            // todo 
+            System.debug('got a non-200 response when enrolling  user: '+ new_enrl_res.getStatusCode());
+            System.debug(new_enrl_res.toString());
+            String errorStr =  'syncEnrollmentToCanvas '+ '\n' + new_enrl_res.getBody() + '\n'+  new_enrl_res.toString(); 
+            CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncEnrollmentToCanvas');
+
         }
     }
 
