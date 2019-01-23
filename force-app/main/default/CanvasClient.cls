@@ -263,7 +263,7 @@ public with sharing class CanvasClient {
 
         HttpRequest req = new HttpRequest();
         req.setEndpoint(api_base + path);
-        System.debug('API REQUEST: ' method + ' ' +api_base + path);
+        System.debug('API REQUEST: ' + method + ' ' + api_base + path);
         if (useGateway) {
             req.setHeader('x-api-key', settings.ApiGatewayKey__c);
         } else {
