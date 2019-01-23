@@ -4,12 +4,7 @@ trigger syncUserToCanvas on CanvasUser__c (after insert, after update) {
                 System.debug('we are in future or batch context - stopping');
             } else {
                 CanvasClient.syncCanvasUser(u.ID);  
-
-                 ActivityLog__c log = new  ActivityLog__c();
-                log.LEVEL__c = 'AUDIT';
-                log.Message__c = 'Sync user to Canvas '+u.Name;
-                log.Source__c='Trigger:syncUserToCanvas';
-                insert log;              
+                CanvasHelper.ActivityLogGenerate('AUDIT', 'Sync user to Canvas: '+u.Name, 'Trigger:syncUserToCanvas');                    
             }
     }
 }
