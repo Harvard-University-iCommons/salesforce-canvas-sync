@@ -13,6 +13,7 @@
     <tabs>CanvasCourse__c</tabs>
     <tabs>CanvasUser__c</tabs>
     <tabs>CanvasEnrollment__c</tabs>
+    <tabs>ActivityLog__c</tabs>
     <tabs>standard-Contact</tabs>
     <tabs>standard-Product2</tabs>
     <tabs>standard-Account</tabs>
