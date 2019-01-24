@@ -71,12 +71,14 @@ public with sharing class CanvasClient {
             if (update_user_res.getStatusCode() == 200) {
                 CanvasUser__c updatedUser = jsonToUser(update_user_res.getBody(), u);
                 System.debug('successfully updated user'+updatedUser);
+                CanvasHelper.ActivityLogGenerate('DEBUG', 'successfully updated user:'+updatedUser, 'CanvasClient.syncCanvasUser');
+
             } else {
                 System.debug('got a non-200 response from the update/edit user call: '+ update_user_res.getStatusCode());
                 System.debug(update_user_res.getBody());
                 System.debug(update_user_req.toString());
                 String errorStr =  'syncCanvasUser '+ '\n' + update_user_res.getBody() + '\n'+  update_user_req.toString(); 
-                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
             } 
         }
         else {
@@ -109,28 +111,27 @@ public with sharing class CanvasClient {
                         CanvasUser__c updatedUser = jsonToUser(new_user_res.getBody(), u);
                         System.debug(updatedUser);
                         update updatedUser;
+                        CanvasHelper.ActivityLogGenerate('DEBUG', 'Created new user:'+updatedUser, 'CanvasClient.syncCanvasUser');
+
                     } else {
                         System.debug('got a non-200 response from the create user call: '+ new_user_res.getStatusCode());
                         System.debug(new_user_res.getBody());
                         System.debug(new_user_req.toString());
-
                         String errorStr =  'syncCanvasUser '+ '\n' + new_user_res.getBody() + '\n'+  new_user_res.toString(); 
-                        CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
+                        CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
                     }                
                 } else {
                     // Found more than one matching user; bail
-                    System.debug('Search for ' + contact.Email + ' returned ' + users.size() +' results');                    
-                    
+                    System.debug('Search for ' + contact.Email + ' returned ' + users.size() +' results');                               
                     String errorStr =  'Search for ' + contact.Email + ' returned ' + users.size() +' results';                        
-                    CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
+                    CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
 
                     return;
                 }
             } else {
-                System.debug('searching for a user returned a non-200 response');
-                
+                System.debug('searching for a user returned a non-200 response');         
                 String errorStr =  'searching for a user returned a non-200 response';                       
-                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient');
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
             }
         }
     }
