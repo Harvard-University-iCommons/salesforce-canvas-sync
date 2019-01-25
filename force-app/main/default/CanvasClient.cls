@@ -20,12 +20,12 @@ public with sharing class CanvasClient {
             canvasCourseIdParam = 'sis_course_id:' + c.Id;
         }
 
-        HttpRequest req = prepareRequest('courses/' + canvasCourseIdParam, 'GET', settings);
+        HttpRequest req = prepareRequest('courses/' + canvasCourseIdParam, 'GET', settings, false);
         HTTPResponse res = http.send(req);
         
         if (res.getStatusCode() == 200) {
             // the course exists in Canvas; update it 
-            HttpRequest upd_req = prepareRequest('courses/' + canvasCourseIdParam, 'PUT', settings);
+            HttpRequest upd_req = prepareRequest('courses/' + canvasCourseIdParam, 'PUT', settings, false);
             String courseJson = courseToJson(c);
             upd_req.setBody(courseJson);
             HTTPResponse upd_res = http.send(upd_req);
@@ -35,7 +35,7 @@ public with sharing class CanvasClient {
             CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Canvas Course: '+c, 'CanvasClient.syncCanvasCourse');
         } else if (res.getStatusCode() == 404) {
             // the course doesn't exist in Canvas; create it
-            HttpRequest new_course_req = prepareRequest('accounts/' + sub_account_id + '/courses', 'POST', settings);
+            HttpRequest new_course_req = prepareRequest('accounts/' + sub_account_id + '/courses', 'POST', settings, false);
             new_course_req.setBody(courseToJson(c));
             HTTPResponse new_course_res = http.send(new_course_req);
             
@@ -64,7 +64,7 @@ public with sharing class CanvasClient {
         if (u.CanvasUserId__c != null) {
             System.debug('updating an existing Canvas user by id: ' + u.CanvasUserId__c);
             // update the name and email, as user is already present
-            HttpRequest update_user_req = prepareRequest('/users/'+ u.CanvasUserId__c, 'PUT', settings);
+            HttpRequest update_user_req = prepareRequest('users/'+ u.CanvasUserId__c, 'PUT', settings, true);
             update_user_req.setBody(userToJsonForUpdate(u));
             HTTPResponse update_user_res = http.send(update_user_req);      
             if (update_user_res.getStatusCode() == 200) {
@@ -82,7 +82,7 @@ public with sharing class CanvasClient {
         else {
             // First, search for an existing user with this email address
             String search_term = EncodingUtil.urlEncode(u.Contact__r.Email, 'UTF-8');
-            HttpRequest find_user_req = prepareRequest('accounts/1/users?search_term='+search_term, 'GET', settings);
+            HttpRequest find_user_req = prepareRequest('accounts/1/users?search_term='+search_term, 'GET', settings, true);
             Map<String, String> params = new Map<String, String>();
             params.put('search_term', u.Contact__r.Email);
             HTTPResponse find_user_res = http.send(find_user_req);  
@@ -102,7 +102,7 @@ public with sharing class CanvasClient {
                     return;
                 } else if (users.size() == 0) {
                     // Found no users, so we need to create one
-                    HttpRequest new_user_req = prepareRequest('accounts/1/users', 'POST', settings);
+                    HttpRequest new_user_req = prepareRequest('accounts/1/users', 'POST', settings, true);
                     new_user_req.setBody(userToJson(u));
                     HTTPResponse new_user_res = http.send(new_user_req);
                     
@@ -142,7 +142,7 @@ public with sharing class CanvasClient {
         // now we've got a Canvas user and course ID; ready to create/update the enrollment record: 
         Canvas_Settings__c settings = Canvas_Settings__c.getInstance();
         
-        HttpRequest new_enrl_req = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments', 'POST', settings);
+        HttpRequest new_enrl_req = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments', 'POST', settings, false);
         new_enrl_req.setBody(enrollmentToJson(ce));
         Http http = new Http();
         HTTPResponse new_enrl_res = http.send(new_enrl_req);
@@ -257,17 +257,28 @@ public with sharing class CanvasClient {
         return canvasEnrollment;
     }
 
-    private static HttpRequest prepareRequest(String path, String method, Canvas_Settings__c settings) {
+    private static HttpRequest prepareRequest(String path, String method, Canvas_Settings__c settings, Boolean useGateway) {
         // get the settings that we'll need 
         String token = settings.token__c;
         System.debug('token: ' + token);
-        String base_url = settings.base_url__c;
+        String base_url;
+        if (useGateway) {
+            base_url = settings.ApiGatewayBaseUrl__c;
+        } else {
+            base_url = settings.base_url__c;
+        }
         String api_base = base_url + 'api/v1/';
 
         HttpRequest req = new HttpRequest();
         req.setEndpoint(api_base + path);
-        req.setHeader('Authorization', 'Bearer ' + token);
+        System.debug('API REQUEST: ' + method + ' ' + api_base + path);
+        if (useGateway) {
+            req.setHeader('x-api-key', settings.ApiGatewayKey__c);
+        } else {
+            req.setHeader('Authorization', 'Bearer ' + token);
+        }
         req.setMethod(method);
+        req.setHeader('Accept', 'application/json');
         req.setHeader('Content-Type', 'application/json');
         return req;
     }
