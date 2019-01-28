@@ -2,7 +2,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
-        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
+        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
         System.debug(c.Name);
                 
         Integer canvas_course_id;
@@ -165,15 +165,15 @@ public with sharing class CanvasClient {
     private static String courseToJson(CanvasCourse__c canvasCourse) {
         // given a CanvasCourse sObject, return a JSON string that can be passed to the Canvas create/update course API call
         Map<String, Object> innerMap = new Map<String, Object>();
-
+        System.debug('user TZ: ' +UserInfo.getTimeZone().getDisplayName());
         innerMap.put('name', canvasCourse.Title__c);
         innerMap.put('course_code', canvasCourse.Name);
         innerMap.put('sis_course_id', canvasCourse.Id);
-
+        innerMap.put('start_at', canvasCourse.Start_Date__c);
+        innerMap.put('end_at', canvasCourse.End_Date__c);
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('course', innerMap);
         String jsonCourse = JSON.serializePretty(outerMap, true);
-
         return jsonCourse;
     }
 
