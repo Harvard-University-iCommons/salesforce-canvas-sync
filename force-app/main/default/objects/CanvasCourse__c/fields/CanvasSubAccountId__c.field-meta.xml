@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>CanvasSubAccountId__c</fullName>
-    <defaultValue>749</defaultValue>
+    <defaultValue>$Setup.Canvas_Settings__c.sub_account_id__c</defaultValue>
     <externalId>true</externalId>
+    <inlineHelpText>When creating a new course, defaults to the account defined in Custom Settings/Canvas API Settings, but another account id may be entered (subject to accounts available to the Canvas token being used).</inlineHelpText>
     <label>Canvas Sub Account ID</label>
     <precision>10</precision>
     <required>true</required>
