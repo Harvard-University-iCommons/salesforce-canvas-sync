@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>sub_account_id__c</fullName>
-    <defaultValue>749</defaultValue>
+    <defaultValue></defaultValue>
     <externalId>true</externalId>
     <label>Sub-account ID</label>
     <precision>18</precision>
