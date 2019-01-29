@@ -2,7 +2,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
-        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
+        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, CanvasSubAccountId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
         System.debug(c.Name);
                 
         Integer canvas_course_id;
@@ -35,7 +35,7 @@ public with sharing class CanvasClient {
             CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Canvas Course: '+c, 'CanvasClient.syncCanvasCourse');
         } else if (res.getStatusCode() == 404) {
             // the course doesn't exist in Canvas; create it
-            HttpRequest new_course_req = prepareRequest('accounts/' + sub_account_id + '/courses', 'POST', settings, false);
+            HttpRequest new_course_req = prepareRequest('accounts/' + c.CanvasSubAccountId__c + '/courses', 'POST', settings, false);
             new_course_req.setBody(courseToJson(c));
             HTTPResponse new_course_res = http.send(new_course_req);
             
@@ -169,7 +169,7 @@ public with sharing class CanvasClient {
         innerMap.put('name', canvasCourse.Title__c);
         innerMap.put('course_code', canvasCourse.Name);
         innerMap.put('sis_course_id', canvasCourse.Id);
-
+        innerMap.put('account_id', canvasCourse.CanvasSubAccountId__c);
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('course', innerMap);
         String jsonCourse = JSON.serializePretty(outerMap, true);
