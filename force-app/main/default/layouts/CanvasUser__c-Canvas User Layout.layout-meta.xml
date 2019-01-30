@@ -24,11 +24,11 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Email__c</field>
+                <field>Fullname__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>Fullname__c</field>
+                <field>Email__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns/>
