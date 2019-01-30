@@ -53,7 +53,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasUser(Id canvasUserRecordId) {
-        CanvasUser__c u = [SELECT Id, CanvasUserId__c, Firstname__c, Lastname__c, Email__c  FROM CanvasUser__c WHERE Id = :canvasUserRecordId LIMIT 1];   
+        CanvasUser__c u = [SELECT Id, CanvasUserId__c, Fullname__c, Email__c  FROM CanvasUser__c WHERE Id = :canvasUserRecordId LIMIT 1];   
         Canvas_Settings__c settings = Canvas_Settings__c.getInstance();
     
         Http http = new Http();
@@ -190,7 +190,7 @@ public with sharing class CanvasClient {
     private static String userToJson(CanvasUser__c canvasUser) {
         // given a CanvasUser sObject, return a JSON string that can be passed to the Canvas create/update user API call
         Map<String, Object> userMap = new Map<String, Object>();        
-        userMap.put('name', canvasUser.Firstname__c + ' ' + canvasUser.Lastname__c);
+        userMap.put('name', canvasUser.Fullname__c);
         userMap.put('skip_registration', 'false');
 
         Map<String, Object> pseudonymMap = new Map<String, Object>();
@@ -216,7 +216,7 @@ public with sharing class CanvasClient {
         // Note that the json format is different for update/edit
         
         Map<String, Object> userMap = new Map<String, Object>();
-        userMap.put('name', canvasUser.Firstname__c + ' ' + canvasUser.Lastname__c);
+        userMap.put('name', canvasUser.Fullname__c);
         userMap.put('email', canvasUser.Email__c);
        
         Map<String, Object> outerMap = new Map<String, Object>();
