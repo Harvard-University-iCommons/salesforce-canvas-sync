@@ -21,7 +21,7 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>End_Date__c</field>
-            </layoutItems>
+            </layoutItems>            
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>CanvasCourseId__c</field>
@@ -29,10 +29,6 @@
             <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>CanvasCourseLink__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>BlueprintCanvasCourseId__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
