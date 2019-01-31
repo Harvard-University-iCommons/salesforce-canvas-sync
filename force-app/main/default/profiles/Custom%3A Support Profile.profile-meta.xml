@@ -5,8 +5,17 @@
         <default>false</default>
         <visible>false</visible>
     </applicationVisibilities>
+    <applicationVisibilities>
+        <application>standard__AppLauncher</application>
+        <default>false</default>
+        <visible>true</visible>
+    </applicationVisibilities>
     <classAccesses>
         <apexClass>CanvasClient</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CanvasHelper</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <custom>true</custom>
@@ -44,6 +53,11 @@
         <editable>false</editable>
         <field>CanvasUser__c.ConfirmationUrl__c</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CanvasUser__c.Contact__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
         <layout>ActivityLog__c-Canvas Sync Activity Log Layout</layout>
