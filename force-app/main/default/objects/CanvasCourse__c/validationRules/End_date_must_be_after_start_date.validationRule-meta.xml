@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>End_date_must_be_after_start_date</fullName>
+    <active>true</active>
+    <errorConditionFormula>DATETIMEVALUE(End_Date__c) &lt; DATETIMEVALUE(Start_Date__c)</errorConditionFormula>
+    <errorDisplayField>End_Date__c</errorDisplayField>
+    <errorMessage>Course end date must be after course start date</errorMessage>
+</ValidationRule>

@@ -2,7 +2,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
-        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, CanvasSubAccountId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
+        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c, CanvasSubAccountId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
         System.debug(c.Name);
                 
         Integer canvas_course_id;
@@ -53,8 +53,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasUser(Id canvasUserRecordId) {
-        CanvasUser__c u = [SELECT Id, CanvasUserId__c, Contact__r.Name, Contact__r.Email  FROM CanvasUser__c WHERE Id = :canvasUserRecordId LIMIT 1];        
-        Contact contact = u.Contact__r; 
+        CanvasUser__c u = [SELECT Id, CanvasUserId__c, Fullname__c, Email__c  FROM CanvasUser__c WHERE Id = :canvasUserRecordId LIMIT 1];   
         Canvas_Settings__c settings = Canvas_Settings__c.getInstance();
     
         Http http = new Http();
@@ -81,10 +80,10 @@ public with sharing class CanvasClient {
         }
         else {
             // First, search for an existing user with this email address
-            String search_term = EncodingUtil.urlEncode(u.Contact__r.Email, 'UTF-8');
+            String search_term = EncodingUtil.urlEncode(u.Email__c, 'UTF-8');
             HttpRequest find_user_req = prepareRequest('accounts/1/users?search_term='+search_term, 'GET', settings, true);
             Map<String, String> params = new Map<String, String>();
-            params.put('search_term', u.Contact__r.Email);
+            params.put('search_term', u.Email__c);
             HTTPResponse find_user_res = http.send(find_user_req);  
 
             if (find_user_res.getStatusCode() == 200) {
@@ -95,7 +94,7 @@ public with sharing class CanvasClient {
                     String userJsonText = JSON.serialize(users.get(0));
                     Map<String, Object> user = (Map<String, Object>) JSON.deserializeUntyped(userJsonText); 
                     Integer canvas_user_id = (Integer)user.get('id');
-                    System.debug('Search for ' + u.Contact__r.Email + ' returned ' + canvas_user_id);
+                    System.debug('Search for ' + u.Email__c + ' returned ' + canvas_user_id);
                     u.CanvasUserId__c = canvas_user_id;
                     update u;
                     CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated existing user:'+u, 'CanvasClient.syncCanvasUser');
@@ -165,15 +164,16 @@ public with sharing class CanvasClient {
     private static String courseToJson(CanvasCourse__c canvasCourse) {
         // given a CanvasCourse sObject, return a JSON string that can be passed to the Canvas create/update course API call
         Map<String, Object> innerMap = new Map<String, Object>();
-
+        System.debug('user TZ: ' +UserInfo.getTimeZone().getDisplayName());
         innerMap.put('name', canvasCourse.Title__c);
         innerMap.put('course_code', canvasCourse.Name);
         innerMap.put('sis_course_id', canvasCourse.Id);
         innerMap.put('account_id', canvasCourse.CanvasSubAccountId__c);
+        innerMap.put('start_at', canvasCourse.Start_Date__c);
+        innerMap.put('end_at', canvasCourse.End_Date__c);
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('course', innerMap);
         String jsonCourse = JSON.serializePretty(outerMap, true);
-
         return jsonCourse;
     }
 
@@ -190,18 +190,18 @@ public with sharing class CanvasClient {
 
     private static String userToJson(CanvasUser__c canvasUser) {
         // given a CanvasUser sObject, return a JSON string that can be passed to the Canvas create/update user API call
-        Map<String, Object> userMap = new Map<String, Object>();
-        userMap.put('name', canvasUser.Contact__r.Name);
+        Map<String, Object> userMap = new Map<String, Object>();        
+        userMap.put('name', canvasUser.Fullname__c);
         userMap.put('skip_registration', 'false');
 
         Map<String, Object> pseudonymMap = new Map<String, Object>();
-        pseudonymMap.put('unique_id', canvasUser.Contact__r.Email);
+        pseudonymMap.put('unique_id', canvasUser.Email__c);
         pseudonymMap.put('send_confirmation', 'false');
 
         Map<String, Object> communicationChannelMap = new Map<String, Object>();
         communicationChannelMap.put('confirmation_url', 'true');
         communicationChannelMap.put('type', 'email');
-        communicationChannelMap.put('address', canvasUser.Contact__r.Email);
+        communicationChannelMap.put('address', canvasUser.Email__c);
 
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('user', userMap);
@@ -217,8 +217,8 @@ public with sharing class CanvasClient {
         // Note that the json format is different for update/edit
         
         Map<String, Object> userMap = new Map<String, Object>();
-        userMap.put('name', canvasUser.Contact__r.Name);
-        userMap.put('email', canvasUser.Contact__r.Email);
+        userMap.put('name', canvasUser.Fullname__c);
+        userMap.put('email', canvasUser.Email__c);
        
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('user', userMap);
