@@ -2,7 +2,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
-        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c, CanvasSubAccountId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
+        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c, CanvasSubAccountId__c, BlueprintCanvasCourseId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
         System.debug(c.Name);
                 
         Integer canvas_course_id;
@@ -20,6 +20,11 @@ public with sharing class CanvasClient {
             canvasCourseIdParam = 'sis_course_id:' + c.Id;
         }
 
+        //get the Blueprint Course Id if present
+        String blueprintCanvasCourseIdParam;
+        System.debug('value of c============'+c);
+
+
         HttpRequest req = prepareRequest('courses/' + canvasCourseIdParam, 'GET', settings, false);
         HTTPResponse res = http.send(req);
         
@@ -32,6 +37,12 @@ public with sharing class CanvasClient {
             System.debug('update response: ' + upd_res.getStatusCode());
             c = jsonToCourse(upd_res.getBody(), c);
             update c;
+            //update blueprint course subscription if it exists.
+            if (c.BlueprintCanvasCourseId__c != null) {
+                System.debug('1111!!!');
+                subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, c.CanvasCourseId__c);
+            }
+        
             CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Canvas Course: '+c, 'CanvasClient.syncCanvasCourse');
         } else if (res.getStatusCode() == 404) {
             // the course doesn't exist in Canvas; create it
@@ -42,12 +53,17 @@ public with sharing class CanvasClient {
             if (new_course_res.getStatusCode() == 200) {
                 CanvasCourse__c updatedCourse = jsonToCourse(new_course_res.getBody(), c);
                 update updatedCourse;
+                //update blueprint course subscription if it exists
+                if (c.BlueprintCanvasCourseId__c != null) {
+                    System.debug('22222!!!');
+                    subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, updatedCourse.CanvasCourseId__c);
+                }
                 CanvasHelper.ActivityLogGenerate('DEBUG', 'Created Canvas Course: '+updatedCourse, 'CanvasClient.syncCanvasCourse');
             } else {
                 String errorStr =  'syncCanvasCourse '+ '\n' + new_course_res.getBody() + '\n'+  new_course_res.toString(); 
                 System.debug(errorStr); 
                 CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasCourse');
-            }     
+            }    
         }
     }
 
@@ -160,7 +176,24 @@ public with sharing class CanvasClient {
 
         }
     }
-
+    private static boolean subscribeToBlueprintCourse(String BlueprintCanvasCourseId, Integer currentCanvasCourseId){
+        bpCanvasCourseIdParam = String.valueOf(BlueprintCanvasCourseId);
+        HttpRequest upd_req = prepareRequest('courses/' + bpCanvasCourseIdParam +'/blueprint_templates/default/update_associations?course_ids_to_add[]='+currentCanvasCourseId, 'PUT', settings, false);
+        System.debug('upd_req='+upd_req);
+        String courseJson = courseToJson(c);
+        // upd_req.setBody(courseJson);
+        HTTPResponse upd_res = http.send(upd_req);
+        System.debug('update response: ' + upd_res.getStatusCode());
+        // c = jsonToCourse(upd_res.getBody(), c);
+        // update c;
+        //flag an erro if teh update wasnt successful
+        if (upd_res.getStatusCode() == 200){
+            CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint Course :'+BlueprintCanvasCourseId+' in course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
+        } else{
+            CanvasHelper.ActivityLogGenerate('ERROR', 'Error in blueprint subscription in course:'+currentCanvasCourseId , 'CanvasClient.subscribeToBlueprintCourse');
+        }
+        
+    }
     private static String courseToJson(CanvasCourse__c canvasCourse) {
         // given a CanvasCourse sObject, return a JSON string that can be passed to the Canvas create/update course API call
         Map<String, Object> innerMap = new Map<String, Object>();
