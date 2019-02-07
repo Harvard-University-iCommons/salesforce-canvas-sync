@@ -19,11 +19,7 @@ public with sharing class CanvasClient {
         } else {
             canvasCourseIdParam = 'sis_course_id:' + c.Id;
         }
-
-        //get the Blueprint Course Id if present
         String blueprintCanvasCourseIdParam;
-        System.debug('value of c============'+c);
-
 
         HttpRequest req = prepareRequest('courses/' + canvasCourseIdParam, 'GET', settings, false);
         HTTPResponse res = http.send(req);
@@ -34,15 +30,16 @@ public with sharing class CanvasClient {
             String courseJson = courseToJson(c);
             upd_req.setBody(courseJson);
             HTTPResponse upd_res = http.send(upd_req);
-            System.debug('update response: ' + upd_res.getStatusCode());
             c = jsonToCourse(upd_res.getBody(), c);
-            update c;
             //update blueprint course subscription if it exists.
             if (c.BlueprintCanvasCourseId__c != null) {
-                System.debug('1111!!!');
                 subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, c.CanvasCourseId__c);
+            } else{
+                //check if existing blue print subscription should be unsubscribed?
+
             }
-        
+            //Note: The DB update needs to happen after the api call. SF complains about uncommited transaction otherwise
+            update c;
             CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Canvas Course: '+c, 'CanvasClient.syncCanvasCourse');
         } else if (res.getStatusCode() == 404) {
             // the course doesn't exist in Canvas; create it
@@ -52,12 +49,12 @@ public with sharing class CanvasClient {
             
             if (new_course_res.getStatusCode() == 200) {
                 CanvasCourse__c updatedCourse = jsonToCourse(new_course_res.getBody(), c);
-                update updatedCourse;
-                //update blueprint course subscription if it exists
+                //update blueprint course if subscription  exists
                 if (c.BlueprintCanvasCourseId__c != null) {
-                    System.debug('22222!!!');
                     subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, updatedCourse.CanvasCourseId__c);
                 }
+                //Note: The DB update needs to happen after the api call. SF complains about uncommited transaction otherwise
+                update updatedCourse;
                 CanvasHelper.ActivityLogGenerate('DEBUG', 'Created Canvas Course: '+updatedCourse, 'CanvasClient.syncCanvasCourse');
             } else {
                 String errorStr =  'syncCanvasCourse '+ '\n' + new_course_res.getBody() + '\n'+  new_course_res.toString(); 
@@ -176,21 +173,26 @@ public with sharing class CanvasClient {
 
         }
     }
-    private static boolean subscribeToBlueprintCourse(String BlueprintCanvasCourseId, Integer currentCanvasCourseId){
-        bpCanvasCourseIdParam = String.valueOf(BlueprintCanvasCourseId);
-        HttpRequest upd_req = prepareRequest('courses/' + bpCanvasCourseIdParam +'/blueprint_templates/default/update_associations?course_ids_to_add[]='+currentCanvasCourseId, 'PUT', settings, false);
-        System.debug('upd_req='+upd_req);
-        String courseJson = courseToJson(c);
-        // upd_req.setBody(courseJson);
-        HTTPResponse upd_res = http.send(upd_req);
-        System.debug('update response: ' + upd_res.getStatusCode());
-        // c = jsonToCourse(upd_res.getBody(), c);
-        // update c;
-        //flag an erro if teh update wasnt successful
-        if (upd_res.getStatusCode() == 200){
-            CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint Course :'+BlueprintCanvasCourseId+' in course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
-        } else{
-            CanvasHelper.ActivityLogGenerate('ERROR', 'Error in blueprint subscription in course:'+currentCanvasCourseId , 'CanvasClient.subscribeToBlueprintCourse');
+
+    private static void  subscribeToBlueprintCourse(Decimal BlueprintCanvasCourseId, Decimal currentCanvasCourseId){
+        try{
+            Http http = new Http();
+            Canvas_Settings__c settings = Canvas_Settings__c.getInstance(); 
+            String bpCanvasCourseIdParam = String.valueOf(BlueprintCanvasCourseId);
+            String currentCanvasCourseIdParam = String.valueOf(currentCanvasCourseId);
+
+            HttpRequest upd_req = prepareRequest('courses/' + bpCanvasCourseIdParam +'/blueprint_templates/default/update_associations?course_ids_to_add[]='+currentCanvasCourseIdParam, 'PUT', settings, false);
+            HTTPResponse upd_res = http.send(upd_req);
+            if (upd_res.getStatusCode() == 200){
+                CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
+            } else{
+                System.debug('got a non-200 response in blueprint subscription'+upd_res.toString());
+                CanvasHelper.ActivityLogGenerate('ERROR', 'Error in blueprint subscription forcourse:'+currentCanvasCourseId+',error='+upd_res.toString(), 'CanvasClient.subscribeToBlueprintCourse');
+            }
+        }catch(Exception ex){
+            System.debug('The following exception has occurred in subscribeToBlueprintCourse: ' + ex.getMessage());
+            CanvasHelper.ActivityLogGenerate('ERROR', 'Error in blueprint subscription for course:'+currentCanvasCourseId+
+            ',Exception:'+ex.getMessage() , 'CanvasClient.subscribeToBlueprintCourse');
         }
         
     }
