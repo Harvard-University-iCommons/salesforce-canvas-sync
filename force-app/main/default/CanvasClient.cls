@@ -35,8 +35,7 @@ public with sharing class CanvasClient {
             if (c.BlueprintCanvasCourseId__c != null) {
                 subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, c.CanvasCourseId__c);
             } else{
-                //check if existing blue print subscription should be unsubscribed?
-
+                //TODO:check if existing blue print subscription should be unsubscribed?
             }
             //Note: The DB update needs to happen after the api call. SF complains about uncommited transaction otherwise
             update c;
