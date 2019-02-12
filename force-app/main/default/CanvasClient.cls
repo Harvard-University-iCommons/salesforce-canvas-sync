@@ -133,31 +133,42 @@ public with sharing class CanvasClient {
     }
 
     @future(callout=true)
-    public static void syncEnrollmentToCanvas(Id canvasEnrollmentId) {
+    public static void syncEnrollmentToCanvas(Id canvasEnrollmentId, String requestType) {
 
-        // fetch the CanvasEnrollment__c record
-        CanvasEnrollment__c ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId];
-
-        // now we've got a Canvas user and course ID; ready to create/update the enrollment record: 
+        // Get the Canvas settings that will be used in our request 
         Canvas_Settings__c settings = Canvas_Settings__c.getInstance();
-        
-        HttpRequest new_enrl_req = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments', 'POST', settings, false);
-        new_enrl_req.setBody(enrollmentToJson(ce));
-        Http http = new Http();
-        HTTPResponse new_enrl_res = http.send(new_enrl_req);
-        
-        if (new_enrl_res.getStatusCode() == 200) {
-            String newEnrlJsonText = new_enrl_res.getBody();
-            ce = jsonToEnrollment(newEnrlJsonText, ce);
-            update ce;
-            CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated user enrollment : '+ce+' in course:'+ce.CanvasCourse__r.CanvasCourseId__c, 'CanvasClient.syncEnrollmentToCanvas');
 
+        HttpRequest enrlReq;
+        CanvasEnrollment__c ce;
+
+        // Build the appropriate type of request based off of what we are trying to, delete an enrollement or create/update
+        if(requestType=='delete') {
+            ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId AND IsDeleted=true ALL ROWS];
+            enrlReq = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments/'+ce.CanvasEnrollmentId__c, 'DELETE', settings, false);
+            Map<String, String> bodyMap = new Map<String, String>();
+            bodyMap.put('task', 'delete');
+            String jsonEnrollmentBody = JSON.serializePretty(bodyMap, true);
+            enrlReq.setBody(jsonEnrollmentBody);
         } else {
-            System.debug('got a non-200 response when enrolling  user: '+ new_enrl_res.getStatusCode());
-            System.debug(new_enrl_res.toString());
-            String errorStr =  'syncEnrollmentToCanvas '+ '\n' + new_enrl_res.getBody() + '\n'+  new_enrl_res.toString(); 
-            CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncEnrollmentToCanvas');
+            ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId];
+            enrlReq = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments', 'POST', settings, false);
+            enrlReq.setBody(enrollmentToJson(ce));
+        }
 
+        Http http = new Http();
+        HTTPResponse enrlRes = http.send(enrlReq);
+
+        if (enrlRes.getStatusCode() == 200) {
+            String enrlJsonText = enrlRes.getBody();
+            ce = jsonToEnrollment(enrlJsonText, ce);
+            // Only perform an update on the enrollment if we are not performing a delete
+            if (requestType!='delete') {update ce;}
+            CanvasHelper.ActivityLogGenerate('DEBUG', 'Successfully performed a '+ requestType +' on user enrollment : '+ce+' in course:'+ce.CanvasCourse__r.CanvasCourseId__c, 'CanvasClient.syncEnrollmentToCanvas');
+        } else {
+            System.debug('got a non-200 response when enrolling  user: '+ enrlRes.getStatusCode());
+            System.debug(enrlRes.toString());
+            String errorStr =  'syncEnrollmentToCanvas '+ '\n' + enrlRes.getBody() + '\n'+  enrlRes.toString(); 
+            CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncEnrollmentToCanvas');
         }
     }
 

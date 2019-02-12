@@ -1,10 +1,15 @@
-trigger syncEnrollmentToCanvas on CanvasEnrollment__c (after insert, after update) {
-    for (CanvasEnrollment__c e : Trigger.new) {
-            if(System.isFuture() || System.isBatch()){
-                System.debug('we are in future or batch context - stopping');
-            } else {
-                CanvasClient.syncEnrollmentToCanvas(e.Id);   
-                CanvasHelper.ActivityLogGenerate('AUDIT', 'Added enrollment to Canvas: '+e.Name, 'Trigger:syncEnrollmentToCanvas');         
+trigger syncEnrollmentToCanvas on CanvasEnrollment__c (after insert, after update, before delete) {
+    if(System.isFuture() || System.isBatch()){
+        System.debug('we are in future or batch context - stopping');
+    } else {
+        if(Trigger.isDelete) {
+            for (CanvasEnrollment__c e : Trigger.old) {
+                CanvasClient.syncEnrollmentToCanvas(e.Id, 'delete');   
             }
+        } else {
+            for (CanvasEnrollment__c e : Trigger.new) {
+                CanvasClient.syncEnrollmentToCanvas(e.Id, 'add_update');   
+            }       
+        }
     }
 }
