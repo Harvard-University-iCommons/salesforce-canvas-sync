@@ -3,7 +3,6 @@ public with sharing class CanvasClient {
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
         CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c, CanvasSubAccountId__c, BlueprintCanvasCourseId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
-        System.debug(c.Name);
                 
         Integer canvas_course_id;
 
@@ -185,8 +184,24 @@ public with sharing class CanvasClient {
             if (upd_res.getStatusCode() == 200){
                 CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
             } else{
-                System.debug('got a non-200 response in blueprint subscription'+upd_res.toString());
-                CanvasHelper.ActivityLogGenerate('ERROR', 'Error in blueprint subscription forcourse:'+currentCanvasCourseId+',error='+upd_res.toString(), 'CanvasClient.subscribeToBlueprintCourse');
+                //If the Blueprint subscription fails, try once more after a 2 second wait(We are noticing some 400s when a Blueprint 
+                //subscription happens soon after course creation)
+                Long milliSeconds = 2000;
+                Long timeDiff = 0;
+                DateTime firstTime = System.now();
+                do{
+                    timeDiff = System.now().getTime() - firstTime.getTime();
+                }
+                while(timeDiff <= milliSeconds);
+               
+                upd_res = http.send(upd_req);
+                if (upd_res.getStatusCode() == 200){
+                    CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to(2nd attempt)  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
+                } else{
+                    System.debug('got another non-200 response in blueprint subscription'+upd_res.toString());
+                    CanvasHelper.ActivityLogGenerate('ERROR', 'Repeated error in blueprint subscription for course:'+currentCanvasCourseId+',error='+upd_res.toString(), 'CanvasClient.subscribeToBlueprintCourse');
+                }
+                
             }
         }catch(Exception ex){
             System.debug('The following exception has occurred in subscribeToBlueprintCourse: ' + ex.getMessage());
