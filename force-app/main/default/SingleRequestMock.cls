@@ -36,7 +36,7 @@ public class SingleRequestMock implements HttpCalloutMock {
 
 			if (responseHeaders != null) {
 			     for (String key : responseHeaders.keySet()) {
-				resp.setHeader(key, responseHeaders.get(key));
+					resp.setHeader(key, responseHeaders.get(key));
 			     }
 			}
 			return resp;
