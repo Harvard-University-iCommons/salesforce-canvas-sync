@@ -152,9 +152,9 @@ public with sharing class CanvasClient {
         HttpRequest enrlReq;
         CanvasEnrollment__c ce;
 
-        // Build the appropriate type of request based off of what we are trying to, delete an enrollement or create/update
+        // Build the appropriate type of request based off of what we are trying to, delete an enrollment or create/update
         if(requestType=='delete') {
-            ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId AND IsDeleted=true ALL ROWS];
+            ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId ALL ROWS];
             enrlReq = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments/'+ce.CanvasEnrollmentId__c, 'DELETE', settings, false);
             Map<String, String> bodyMap = new Map<String, String>();
             bodyMap.put('task', 'delete');

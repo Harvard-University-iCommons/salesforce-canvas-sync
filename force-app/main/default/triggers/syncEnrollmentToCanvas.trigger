@@ -8,7 +8,13 @@ trigger syncEnrollmentToCanvas on CanvasEnrollment__c (after insert, after updat
             }
         } else {
             for (CanvasEnrollment__c e : Trigger.new) {
-                CanvasClient.syncEnrollmentToCanvas(e.Id, 'add_update');   
+                if(e.Status__c == 'Deleted') {
+                    CanvasClient.syncEnrollmentToCanvas(e.Id, 'delete');
+                } else if (e.Status__c == 'Active') {
+                    CanvasClient.syncEnrollmentToCanvas(e.Id, 'add_update');
+                } else {
+                    // do nothing
+                }
             }       
         }
     }

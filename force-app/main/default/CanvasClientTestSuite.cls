@@ -13,6 +13,7 @@ private class CanvasClientTestSuite {
         
         CanvasCourse__c  canvasCourse = new CanvasCourse__c(CanvasCourseId__c = 123,
                                                             CanvasSubAccountId__c = 10,
+                                                            Term__c = '1',
                                                             Title__c = 'Test Title');        // insert canvasCourse;        
 
         CanvasUser__c canvasUser = new CanvasUser__c(CanvasUserId__c = 1234,
