@@ -28,6 +28,21 @@
     <custom>false</custom>
     <fieldPermissions>
         <editable>true</editable>
+        <field>ActivityLog__c.CanvasCourse__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ActivityLog__c.CanvasEnrollment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>ActivityLog__c.CanvasUser__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>ActivityLog__c.Message__c</field>
         <readable>true</readable>
     </fieldPermissions>

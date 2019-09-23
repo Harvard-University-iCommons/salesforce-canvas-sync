@@ -65,8 +65,18 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>CanvasCourse__c</fields>
         <relatedList>CanvasEnrollment__c.CanvasUser__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>CanvasCourse__c</fields>
+        <fields>CanvasEnrollment__c</fields>
+        <fields>Level__c</fields>
+        <fields>Message__c</fields>
+        <fields>CREATED_DATE</fields>
+        <relatedList>CanvasActivityLog__c.CanvasUser__c</relatedList>
+        <sortField>CREATED_DATE</sortField>
+        <sortOrder>Desc</sortOrder>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
@@ -74,7 +84,7 @@
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
     <summaryLayout>
-        <masterLabel>00hL000000117ju</masterLabel>
+        <masterLabel>00hS0000001KXl4</masterLabel>
         <sizeX>4</sizeX>
         <sizeY>0</sizeY>
         <summaryLayoutStyle>Default</summaryLayoutStyle>

@@ -67,6 +67,6 @@
         <searchResultsAdditionalFields>CanvasUser__c</searchResultsAdditionalFields>
         <searchResultsAdditionalFields>CanvasCourse__c</searchResultsAdditionalFields>
     </searchLayouts>
-    <sharingModel>ReadWrite</sharingModel>
+    <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
 </CustomObject>

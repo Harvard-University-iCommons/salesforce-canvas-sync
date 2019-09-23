@@ -120,7 +120,7 @@ private class CanvasClientTestSuite {
         insert canvasEnrollment;
         // CanvasClient.syncEnrollmentToCanvas(canvasEnrollment.Id, 'delete');
 
-        CanvasClient.subscribeToBlueprintCourse(123,123);
+        CanvasClient.subscribeToBlueprintCourse(canvasCourse.Id, 123,123);
 
         // Putting in calls to methods to get some additional coverage
         CanvasClient.userToJson(canvasUser);
