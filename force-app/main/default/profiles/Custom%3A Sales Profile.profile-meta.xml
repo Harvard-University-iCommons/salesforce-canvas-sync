@@ -28,27 +28,27 @@
     <custom>true</custom>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ActivityLog__c.CanvasCourse__c</field>
+        <field>CanvasActivityLog__c.CanvasCourse__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ActivityLog__c.CanvasEnrollment__c</field>
+        <field>CanvasActivityLog__c.CanvasEnrollment__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ActivityLog__c.CanvasUser__c</field>
+        <field>CanvasActivityLog__c.CanvasUser__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ActivityLog__c.Message__c</field>
+        <field>CanvasActivityLog__c.Message__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ActivityLog__c.Source__c</field>
+        <field>CanvasActivityLog__c.Source__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -102,7 +102,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
-        <layout>ActivityLog__c-Canvas Sync Activity Log Layout</layout>
+        <layout>CanvasActivityLog__c-Canvas Sync Activity Log Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
         <layout>CanvasCourse__c-Canvas course Layout</layout>
@@ -114,7 +114,7 @@
         <layout>CanvasUser__c-Canvas User Layout</layout>
     </layoutAssignments>
     <tabVisibilities>
-        <tab>ActivityLog__c</tab>
+        <tab>CanvasActivityLog__c</tab>
         <visibility>DefaultOn</visibility>
     </tabVisibilities>
     <tabVisibilities>
