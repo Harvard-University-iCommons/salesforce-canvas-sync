@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
-    <label><!-- Canvas User --></label>
-    <name>CanvasUser__c</name>
-    <relationshipLabel><!-- Canvas Activity Logs --></relationshipLabel>
-</CustomFieldTranslation>

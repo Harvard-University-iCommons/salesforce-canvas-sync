@@ -63,7 +63,7 @@
         <fields>Level__c</fields>
         <fields>Message__c</fields>
         <fields>CREATED_DATE</fields>
-        <relatedList>CanvasActivityLog__c.CanvasEnrollment__c</relatedList>
+        <relatedList>ActivityLog__c.CanvasEnrollment__c</relatedList>
         <sortField>CREATED_DATE</sortField>
         <sortOrder>Desc</sortOrder>
     </relatedLists>

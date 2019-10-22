@@ -28,27 +28,27 @@
     <custom>false</custom>
     <fieldPermissions>
         <editable>true</editable>
-        <field>CanvasActivityLog__c.CanvasCourse__c</field>
+        <field>ActivityLog__c.CanvasCourse__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>CanvasActivityLog__c.CanvasEnrollment__c</field>
+        <field>ActivityLog__c.CanvasEnrollment__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>CanvasActivityLog__c.CanvasUser__c</field>
+        <field>ActivityLog__c.CanvasUser__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>CanvasActivityLog__c.Message__c</field>
+        <field>ActivityLog__c.Message__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>CanvasActivityLog__c.Source__c</field>
+        <field>ActivityLog__c.Source__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -102,7 +102,7 @@
         <readable>false</readable>
     </fieldPermissions>
     <layoutAssignments>
-        <layout>CanvasActivityLog__c-Canvas Sync Activity Log Layout</layout>
+        <layout>ActivityLog__c-Canvas Sync Activity Log Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
         <layout>CanvasCourse__c-Canvas course Layout</layout>
@@ -119,7 +119,7 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>true</modifyAllRecords>
-        <object>CanvasActivityLog__c</object>
+        <object>ActivityLog__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <objectPermissions>
@@ -150,7 +150,7 @@
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <tabVisibilities>
-        <tab>CanvasActivityLog__c</tab>
+        <tab>ActivityLog__c</tab>
         <visibility>DefaultOn</visibility>
     </tabVisibilities>
     <tabVisibilities>
