@@ -8,7 +8,8 @@ private class CanvasClientTestSuite {
                                                              ApiGatewayKey__c = 'gateway_key', 
                                                              base_url__c = 'base_url', 
                                                              sub_account_id__c = 5, 
-                                                             token__c = 'test_token');
+                                                             token__c = 'test_token',
+                                                             Active__c = true);
         insert settings;
         
         CanvasCourse__c  canvasCourse = new CanvasCourse__c(CanvasCourseId__c = 123,

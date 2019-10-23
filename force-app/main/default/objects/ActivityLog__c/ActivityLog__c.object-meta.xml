@@ -51,13 +51,13 @@
     <enableSearch>false</enableSearch>
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
-    <label>Canvas Activity Log</label>
+    <label>Canvas Sync Activity Log</label>
     <nameField>
         <displayFormat>CNV-LOG-{0000}</displayFormat>
         <label>Canvas Sync Log</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>Canvas Activity Logs</pluralLabel>
+    <pluralLabel>Canvas Sync Activity Logs</pluralLabel>
     <searchLayouts/>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>
