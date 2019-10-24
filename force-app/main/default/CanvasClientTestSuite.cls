@@ -8,11 +8,13 @@ private class CanvasClientTestSuite {
                                                              ApiGatewayKey__c = 'gateway_key', 
                                                              base_url__c = 'base_url', 
                                                              sub_account_id__c = 5, 
-                                                             token__c = 'test_token');
+                                                             token__c = 'test_token',
+                                                             Active__c = true);
         insert settings;
         
         CanvasCourse__c  canvasCourse = new CanvasCourse__c(CanvasCourseId__c = 123,
                                                             CanvasSubAccountId__c = 10,
+                                                            Term__c = '1',
                                                             Title__c = 'Test Title');        // insert canvasCourse;        
 
         CanvasUser__c canvasUser = new CanvasUser__c(CanvasUserId__c = 1234,
@@ -119,7 +121,7 @@ private class CanvasClientTestSuite {
         insert canvasEnrollment;
         // CanvasClient.syncEnrollmentToCanvas(canvasEnrollment.Id, 'delete');
 
-        CanvasClient.subscribeToBlueprintCourse(123,123);
+        CanvasClient.subscribeToBlueprintCourse(canvasCourse.Id, 123,123);
 
         // Putting in calls to methods to get some additional coverage
         CanvasClient.userToJson(canvasUser);
