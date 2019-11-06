@@ -2,7 +2,7 @@
 private class CanvasHelperTestSuite {
 
     static testMethod void runPositiveTestCases() {
-        CanvasHelper.ActivityLogGenerate('AUDIT', 'test message', 'Trigger:syncUserToCanvas');
+        CanvasHelper.ActivityLogGenerate('AUDIT', 'test message', 'Trigger:syncUserToCanvas', null, null, null);
         ActivityLog__c log = [SELECT LEVEL__c, Message__c, Source__c FROM ActivityLog__c];
 
         System.assertEquals('AUDIT', log.LEVEL__c);

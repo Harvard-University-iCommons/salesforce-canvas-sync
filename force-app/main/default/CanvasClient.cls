@@ -2,7 +2,7 @@ public with sharing class CanvasClient {
 
     @future(callout=true)
     public static void syncCanvasCourse(Id canvasCourseRecordId) {
-        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c, CanvasSubAccountId__c, BlueprintCanvasCourseId__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
+        CanvasCourse__c c = [SELECT Id, Name, Title__c, CanvasCourseId__c, Start_Date__c, End_Date__c, CanvasSubAccountId__c, BlueprintCanvasCourseId__c, Term__c FROM CanvasCourse__c WHERE ID = :canvasCourseRecordId LIMIT 1];        
                 
         Integer canvas_course_id;
 
@@ -32,13 +32,13 @@ public with sharing class CanvasClient {
             c = jsonToCourse(upd_res.getBody(), c);
             //update blueprint course subscription if it exists.
             if (c.BlueprintCanvasCourseId__c != null) {
-                subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, c.CanvasCourseId__c);
+                subscribeToBlueprintCourse(c.Id, c.BlueprintCanvasCourseId__c, c.CanvasCourseId__c);
             } else{
                 //TODO:check if existing blue print subscription should be unsubscribed?
             }
             //Note: The DB update needs to happen after the api call. SF complains about uncommited transaction otherwise
             update c;
-            CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Canvas Course: '+c, 'CanvasClient.syncCanvasCourse');
+            CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Canvas Course: '+c, 'CanvasClient.syncCanvasCourse', c.Id, null, null);
         } else if (res.getStatusCode() == 404) {
             // the course doesn't exist in Canvas; create it
             HttpRequest new_course_req = prepareRequest('accounts/' + c.CanvasSubAccountId__c + '/courses', 'POST', settings, false);
@@ -49,15 +49,15 @@ public with sharing class CanvasClient {
                 CanvasCourse__c updatedCourse = jsonToCourse(new_course_res.getBody(), c);
                 //update blueprint course if subscription  exists
                 if (c.BlueprintCanvasCourseId__c != null) {
-                    subscribeToBlueprintCourse(c.BlueprintCanvasCourseId__c, updatedCourse.CanvasCourseId__c);
+                    subscribeToBlueprintCourse(c.Id, c.BlueprintCanvasCourseId__c, updatedCourse.CanvasCourseId__c);
                 }
                 //Note: The DB update needs to happen after the api call. SF complains about uncommited transaction otherwise
                 update updatedCourse;
-                CanvasHelper.ActivityLogGenerate('DEBUG', 'Created Canvas Course: '+updatedCourse, 'CanvasClient.syncCanvasCourse');
+                CanvasHelper.ActivityLogGenerate('DEBUG', 'Created Canvas Course: '+updatedCourse, 'CanvasClient.syncCanvasCourse', c.Id, null, null);
             } else {
                 String errorStr =  'syncCanvasCourse '+ '\n' + new_course_res.getBody() + '\n'+  new_course_res.toString(); 
                 System.debug(errorStr); 
-                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasCourse');
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasCourse', c.Id, null, null);
             }    
         }
     }
@@ -80,13 +80,13 @@ public with sharing class CanvasClient {
             if (update_user_res.getStatusCode() == 200) {
                 CanvasUser__c updatedUser = jsonToUser(update_user_res.getBody(), u);
                 System.debug('successfully updated user'+updatedUser);
-                CanvasHelper.ActivityLogGenerate('DEBUG', 'successfully updated user:'+updatedUser, 'CanvasClient.syncCanvasUser');
+                CanvasHelper.ActivityLogGenerate('DEBUG', 'successfully updated user:'+updatedUser, 'CanvasClient.syncCanvasUser', null, null, u.Id);
 
             } else {
                 System.debug('got a non-200 response from the update/edit user call: '+ update_user_res.getStatusCode());
                 String errorStr =  'syncCanvasUser '+ '\n' + update_user_res.getBody() + '\n'+  update_user_req.toString(); 
                 System.debug(errorStr); 
-                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser', null, null, u.Id);
             } 
         }
         else {
@@ -108,7 +108,7 @@ public with sharing class CanvasClient {
                     System.debug('Search for ' + u.Email__c + ' returned ' + canvas_user_id);
                     u.CanvasUserId__c = canvas_user_id;
                     update u;
-                    CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated existing user:'+u, 'CanvasClient.syncCanvasUser');
+                    CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated existing user:'+u, 'CanvasClient.syncCanvasUser', null, null, u.Id);
                     return;
                 } else if (users.size() == 0) {
                     // Found no users, so we need to create one
@@ -120,25 +120,25 @@ public with sharing class CanvasClient {
                         CanvasUser__c updatedUser = jsonToUser(new_user_res.getBody(), u);
                         System.debug(updatedUser);
                         update updatedUser;
-                        CanvasHelper.ActivityLogGenerate('DEBUG', 'Created new user:'+updatedUser, 'CanvasClient.syncCanvasUser');
+                        CanvasHelper.ActivityLogGenerate('DEBUG', 'Created new user:'+updatedUser, 'CanvasClient.syncCanvasUser', null, null, u.Id);
 
                     } else {
                         System.debug('got a non-200 response from the create user call: '+ new_user_res.getStatusCode());
                         String errorStr =  'syncCanvasUser '+ '\n' + new_user_res.getBody() + '\n'+  new_user_res.toString();
                         System.debug(errorStr);  
-                        CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
+                        CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser', null, null, u.Id);
                     }                
                 } else {
                     // Found more than one matching user; bail
                     String errorStr =  'Search for ' + contact.Email + ' returned ' + users.size() +' results';  
                     System.debug(errorStr);                       
-                    CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
+                    CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser', null, null, u.Id);
                     return;
                 }
             } else {
                 String errorStr =  'searching for a user returned a non-200 response'; 
                 System.debug(errorStr);                        
-                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser');
+                CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncCanvasUser', null, null, u.Id);
             }
         }
     }
@@ -152,9 +152,9 @@ public with sharing class CanvasClient {
         HttpRequest enrlReq;
         CanvasEnrollment__c ce;
 
-        // Build the appropriate type of request based off of what we are trying to, delete an enrollement or create/update
+        // Build the appropriate type of request based off of what we are trying to, delete an enrollment or create/update
         if(requestType=='delete') {
-            ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId AND IsDeleted=true ALL ROWS];
+            ce = [SELECT Id, CanvasEnrollmentId__c, CanvasCourse__c, CanvasCourse__r.CanvasCourseId__c, CanvasUser__c, CanvasUser__r.CanvasUserId__c, Status__c from CanvasEnrollment__c where Id = :canvasEnrollmentId];
             enrlReq = prepareRequest('courses/'+ ce.CanvasCourse__r.CanvasCourseId__c +'/enrollments/'+ce.CanvasEnrollmentId__c, 'DELETE', settings, false);
             Map<String, String> bodyMap = new Map<String, String>();
             bodyMap.put('task', 'delete');
@@ -172,19 +172,21 @@ public with sharing class CanvasClient {
         if (enrlRes.getStatusCode() == 200) {
             String enrlJsonText = enrlRes.getBody();
             ce = jsonToEnrollment(enrlJsonText, ce);
-            // Only perform an update on the enrollment if we are not performing a delete
-            if (requestType!='delete') {update ce;}
-            CanvasHelper.ActivityLogGenerate('DEBUG', 'Successfully performed a '+ requestType +' on user enrollment : '+ce+' in course:'+ce.CanvasCourse__r.CanvasCourseId__c, 'CanvasClient.syncEnrollmentToCanvas');
+            CanvasHelper.ActivityLogGenerate('DEBUG', 'Successfully performed a '+ requestType +' on user enrollment : '+ce+' in course:'+ce.CanvasCourse__r.CanvasCourseId__c, 'CanvasClient.syncEnrollmentToCanvas', ce.CanvasCourse__c, ce.Id, ce.CanvasUser__c);
+            if(requestType == 'delete') {
+                ce.CanvasEnrollmentId__c = null;
+            }
+            update ce;
         } else {
             System.debug('got a non-200 response when enrolling  user: '+ enrlRes.getStatusCode());
             System.debug(enrlRes.toString());
             String errorStr =  'syncEnrollmentToCanvas '+ '\n' + enrlRes.getBody() + '\n'+  enrlRes.toString(); 
-            CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncEnrollmentToCanvas');
+            CanvasHelper.ActivityLogGenerate('ERROR', errorStr, 'CanvasClient.syncEnrollmentToCanvas', ce.CanvasCourse__c, ce.Id, ce.CanvasUser__c);
         }
     }
 
     @TestVisible
-    private static void  subscribeToBlueprintCourse(Decimal BlueprintCanvasCourseId, Decimal currentCanvasCourseId){
+    private static void  subscribeToBlueprintCourse(Id courseId, Decimal BlueprintCanvasCourseId, Decimal currentCanvasCourseId){
         try{
             Http http = new Http();
             Canvas_Settings__c settings = Canvas_Settings__c.getInstance(); 
@@ -194,7 +196,7 @@ public with sharing class CanvasClient {
             HttpRequest upd_req = prepareRequest('courses/' + bpCanvasCourseIdParam +'/blueprint_templates/default/update_associations?course_ids_to_add[]='+currentCanvasCourseIdParam, 'PUT', settings, false);
             HTTPResponse upd_res = http.send(upd_req);
             if (upd_res.getStatusCode() == 200){
-                CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
+                CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse', courseId, null, null);
             } else{
                 //If the Blueprint subscription fails, try once more after a 2 second wait(We are noticing some 400s when a Blueprint 
                 //subscription happens soon after course creation)
@@ -208,17 +210,17 @@ public with sharing class CanvasClient {
                
                 upd_res = http.send(upd_req);
                 if (upd_res.getStatusCode() == 200){
-                    CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to(2nd attempt)  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse');
+                    CanvasHelper.ActivityLogGenerate('DEBUG', 'Updated Blueprint subscription to(2nd attempt)  :'+BlueprintCanvasCourseId+' for course:'+currentCanvasCourseId, 'CanvasClient.subscribeToBlueprintCourse', courseId, null, null);
                 } else{
                     System.debug('got another non-200 response in blueprint subscription'+upd_res.toString());
-                    CanvasHelper.ActivityLogGenerate('ERROR', 'Repeated error in blueprint subscription for course:'+currentCanvasCourseId+',error='+upd_res.toString(), 'CanvasClient.subscribeToBlueprintCourse');
+                    CanvasHelper.ActivityLogGenerate('ERROR', 'Repeated error in blueprint subscription for course:'+currentCanvasCourseId+',error='+upd_res.toString(), 'CanvasClient.subscribeToBlueprintCourse', courseId, null, null);
                 }
                 
             }
         }catch(Exception ex){
             System.debug('The following exception has occurred in subscribeToBlueprintCourse: ' + ex.getMessage());
             CanvasHelper.ActivityLogGenerate('ERROR', 'Error in blueprint subscription for course:'+currentCanvasCourseId+
-            ',Exception:'+ex.getMessage() , 'CanvasClient.subscribeToBlueprintCourse');
+            ',Exception:'+ex.getMessage() , 'CanvasClient.subscribeToBlueprintCourse', courseId, null, null);
         }
         
     }
@@ -234,6 +236,7 @@ public with sharing class CanvasClient {
         innerMap.put('account_id', canvasCourse.CanvasSubAccountId__c);
         innerMap.put('start_at', canvasCourse.Start_Date__c);
         innerMap.put('end_at', canvasCourse.End_Date__c);
+        innerMap.put('term_id', canvasCourse.Term__c);
         Map<String, Object> outerMap = new Map<String, Object>();
         outerMap.put('course', innerMap);
         String jsonCourse = JSON.serializePretty(outerMap, true);

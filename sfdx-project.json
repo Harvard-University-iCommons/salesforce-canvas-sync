@@ -6,12 +6,28 @@
             "package": "Canvas Sync",
             "versionName": "v1.0.0",
             "versionNumber": "1.0.0.0"
+        },
+        {
+            "path": "force-app",
+            "package": "Testing Canvas Sync",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT",
+            "default": false
+        },
+        {
+            "path": "force-app",
+            "package": "Testing2 Canvas Sync",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT",
+            "default": false
         }
     ],
     "namespace": "",
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "44.0",
     "packageAliases": {
-        "Canvas Sync": "0Ho1U000000001TSAQ"
+        "Canvas Sync": "0Ho1U000000001TSAQ",
+        "Testing Canvas Sync": "0Ho1U000000fxhkSAA",
+        "Testing2 Canvas Sync": "0Ho1U000000fxhpSAA"
     }
 }
