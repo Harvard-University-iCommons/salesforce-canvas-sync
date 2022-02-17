@@ -2,6 +2,8 @@
 
 This Salesforce app contains functionality to help manage courses, users and enrollments in Canvas.
 
+## NOTE: This project was developed in 2019 and as of 2022 is not currently supported.
+
 ## Installation (DRAFT)
 
 Prerequisites:
